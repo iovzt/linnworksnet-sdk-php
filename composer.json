@@ -1,0 +1,25 @@
+{
+    "name": "iovzt/linnworksnet-sdk-php",
+    "homepage": "https://github.com/iovzt/linnworksnet-sdk-php",
+    "description": "Php sdk for LinnworksNet",
+    "keywords": ["linnworks", "sdk"],
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Iskryzhytskyi Oleksandr",
+            "homepage": "https://github.com/iovzt/linnworksnet-sdk-php"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/iovzt/linnworksnet-sdk-php/issues"
+    },
+    "require": {
+        "php": ">=5.6"
+    },        
+    "autoload": {
+        "psr-4": {
+            "Linnworks\\": "src/"
+        }
+    }    
+}
