@@ -19,7 +19,7 @@ abstract class AuthMethods extends BaseMethods
      * @param string $token
      * @return array
      */
-    public static function AuthorizeByApplication($applicationId, $applicationSecret, $token)
+    public static function authorizeByApplication($applicationId, $applicationSecret, $token)
     {
         return static::getJsonResponse('Auth/AuthorizeByApplication', [
                     'applicationId' => $applicationId,
@@ -31,7 +31,7 @@ abstract class AuthMethods extends BaseMethods
     /**
      * @return string
      */
-    public static function GetServerUTCTime()
+    public static function getServerUTCTime()
     {
         return static::getResponse('Auth/GetServerUTCTime', '');
     }
