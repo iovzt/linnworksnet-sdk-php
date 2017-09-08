@@ -14,6 +14,32 @@ abstract class BaseMethods
 {
 
     /**
+     * @var string
+     */
+    protected static $__lastRequest;
+
+    /**
+     * @var string
+     */
+    protected static $__lastResponse;
+
+    /**
+     * @return string
+     */
+    public static function __getLastRequest()
+    {
+        return self::$__lastRequest;
+    }
+
+    /**
+     * @return string
+     */
+    public static function __getLastResponse()
+    {
+        return (self::$__lastResponse === FALSE) ? NULL : self::$__lastResponse;
+    }
+
+    /**
      * @param string $method
      * @param string $data
      * @param string $token
@@ -45,9 +71,10 @@ abstract class BaseMethods
         }
 
         $context = stream_context_create($opts);
-        $response = file_get_contents($url, FALSE, $context);
+        self::$__lastRequest = "POST $url\nAuthorization: $token\nBody: $data";
+        self::$__lastResponse = @file_get_contents($url, FALSE, $context);
 
-        return $response;
+        return self::$__lastResponse;
     }
 
     /**
@@ -78,8 +105,8 @@ abstract class BaseMethods
      */
     protected static function getObjectResponse($className, $method, $data, $token = NULL, $server = NULL)
     {
-        $response = static::getResponse($method, $data, $token, $server);
-        if (is_array($response)) {
+        $response = static::getJsonResponse($method, $data, $token, $server);
+        if (is_object($response)) {
 
             return $className::populateOne($response);
         }
@@ -96,7 +123,7 @@ abstract class BaseMethods
      */
     protected static function getObjectArrayResponse($className, $method, $data, $token = NULL, $server = NULL)
     {
-        $response = static::getResponse($method, $data, $token, $server);
+        $response = static::getJsonResponse($method, $data, $token, $server);
         if (is_array($response)) {
 
             return $className::populate($response);
@@ -135,6 +162,14 @@ abstract class BaseMethods
 
             throw new Exception('Data can not be converted for request.');
         }
+    }
+
+    /**
+     * @return string
+     */
+    public static function className()
+    {
+        return get_called_class();
     }
 
 }

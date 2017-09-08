@@ -2,6 +2,8 @@
 
 namespace Linnworks\classes;
 
+use stdClass;
+
 /**
  * Object class.
  *
@@ -11,33 +13,32 @@ abstract class Object
 {
 
     /**
-     * @param array $records
+     * @param stdClass $records
      * @return static[]
      */
     public static function populate(Array $records)
     {
         $objects = [];
-        foreach ($records as $attributes) {
+        foreach ($records as $record) {
 
-            $object = new static();
-            foreach ($attributes as $key => $value) {
-
-                $key = lcfirst($key);
-                $object->{$key} = $value;
-            }
-            $objects[] = $object;
+            $objects[] = static::populateOne($record);
         }
         return $objects;
     }
 
     /**
-     * @param array $attributes
+     * @param stdClass $record
      * @return static
      */
-    public static function populateOne(Array $attributes)
+    public static function populateOne(stdClass $record)
     {
-        $objects = static::populate([$attributes]);
-        return reset($objects);
+        $object = new static();
+        foreach (get_object_vars($record) as $key => $value) {
+
+            $key = lcfirst($key);
+            $object->{$key} = $value;
+        }
+        return $object;
     }
 
     /**
