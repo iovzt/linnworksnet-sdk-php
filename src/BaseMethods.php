@@ -4,6 +4,7 @@ namespace Linnworks;
 
 use Exception;
 use Linnworks\exceptions\BadResponseException;
+use Linnworks\exceptions\UnauthorizedException;
 
 /**
  * BaseMethods class.
@@ -24,19 +25,25 @@ abstract class BaseMethods
     protected static $__lastResponse;
 
     /**
+     * @var array
+     */
+    protected static $__lastResponseHeaders;
+
+    /**
      * @return string
      */
     public static function __getLastRequest()
     {
-        return self::$__lastRequest;
+        return trim(self::$__lastRequest, "\r\n");
     }
 
     /**
      * @return string
      */
-    public static function __getLastResponse()
+    public static function __getLastResponse($headers = TRUE)
     {
-        return (self::$__lastResponse === FALSE) ? NULL : self::$__lastResponse;
+        return trim(($headers ? implode("\n", self::$__lastResponseHeaders) . "\n" : '') .
+                ((self::$__lastResponse === FALSE) ? NULL : self::$__lastResponse), "\r\n");
     }
 
     /**
@@ -49,14 +56,15 @@ abstract class BaseMethods
     protected static function getResponse($method, $data, $token = NULL, $server = NULL)
     {
         $data = static::prepareRequestData($data);
+        $headers = "Content-Type: application/x-www-form-urlencoded; charset=UTF-8\r\n";
+        $headers .= "User-Agent: Linnworks PHP API SDK \r\n";
+        $headers .= "Referer: https://www.linnworks.net/ \r\n";
+        $headers .= "Content-Length: " . strlen($data) . "\r\n";
+        $headers .= "Authorization: " . $token . "\r\n";
         $opts = [
             'http' => [
                 'method' => "POST",
-                'header' => "Content-Type: application/x-www-form-urlencoded; charset=UTF-8\r\n" .
-                "User-Agent: Linnworks PHP API SDK \r\n" .
-                "Referer: https://www.linnworks.net/ \r\n" .
-                "Content-Length: " . strlen($data) . "\r\n" .
-                "Authorization: " . $token . "\r\n",
+                'header' => $headers,
                 'content' => $data
             ]
         ];
@@ -71,8 +79,16 @@ abstract class BaseMethods
         }
 
         $context = stream_context_create($opts);
-        self::$__lastRequest = "POST $url\nAuthorization: $token\nBody: $data";
+        self::$__lastRequest = "POST $url\n$headers\n\n$data";
         self::$__lastResponse = @file_get_contents($url, FALSE, $context);
+        self::$__lastResponseHeaders = $http_response_header;
+
+        // handle errors
+        if (isset(self::$__lastResponseHeaders[0]) &&
+                stripos(self::$__lastResponseHeaders[0], '401 Unauthorized') !== FALSE) {
+
+            throw new UnauthorizedException();
+        }
 
         return self::$__lastResponse;
     }
