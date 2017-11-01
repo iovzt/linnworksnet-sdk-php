@@ -11,29 +11,21 @@ class StockLocation extends Object
 {
 
     /**
-     * Location ID
-     * 
      * @var string
      */
     public $stockLocationId;
 
     /**
-     * Location name
-     * 
      * @var string
      */
     public $locationName;
 
     /**
-     * If location is a fulfilment center
-     * 
      * @var boolean
      */
     public $isFulfillmentCenter;
 
     /**
-     * Location tag
-     * 
      * @var string
      */
     public $locationTag;

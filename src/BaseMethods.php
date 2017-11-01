@@ -27,7 +27,15 @@ abstract class BaseMethods
     /**
      * @var array
      */
-    protected static $__lastResponseHeaders;
+    protected static $__lastResponseHeaders = [];
+
+    /**
+     * @return boolean
+     */
+    public static function __hasLastRequest()
+    {
+        return (self::$__lastRequest !== NULL);
+    }
 
     /**
      * @return string
@@ -43,7 +51,7 @@ abstract class BaseMethods
     public static function __getLastResponse($headers = TRUE)
     {
         return trim(($headers ? implode("\n", self::$__lastResponseHeaders) . "\n" : '') .
-                ((self::$__lastResponse === FALSE) ? NULL : self::$__lastResponse), "\r\n");
+                ((self::$__lastResponse) ? self::$__lastResponse : NULL), "\r\n");
     }
 
     /**
@@ -63,6 +71,7 @@ abstract class BaseMethods
         $headers .= "Authorization: " . $token . "\r\n";
         $opts = [
             'http' => [
+                'ignore_errors' => TRUE,
                 'method' => "POST",
                 'header' => $headers,
                 'content' => $data
@@ -156,12 +165,18 @@ abstract class BaseMethods
     {
         if (is_array($data)) {
 
-            $arr = [];
-            foreach ($data as $key => $value) {
+            if (is_int(key($data))) {
 
-                $arr[] = $key . '=' . static::prepareRequestData($value);
+                return json_encode($data);
+            } else {
+
+                $arr = [];
+                foreach ($data as $key => $value) {
+
+                    $arr[] = $key . '=' . static::prepareRequestData($value);
+                }
+                return implode('&', $arr);
             }
-            return implode('&', $arr);
         } elseif (is_object($data)) {
 
             if (method_exists($data, '__toString')) {
@@ -171,13 +186,11 @@ abstract class BaseMethods
 
                 return json_encode($data);
             }
-        } elseif (is_string($data)) {
+        } elseif (is_bool($data)) {
 
-            return $data;
-        } else {
-
-            throw new Exception('Data can not be converted for request.');
+            return !!$data ? 'true' : 'false';
         }
+        return $data;
     }
 
     /**
