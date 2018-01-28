@@ -50,7 +50,8 @@ abstract class BaseMethods
      */
     public static function __getLastResponse($headers = TRUE)
     {
-        return trim(($headers ? implode("\n", self::$__lastResponseHeaders) . "\n" : '') .
+        return trim(($headers && is_array(self::$__lastResponseHeaders) ?
+                implode("\n", self::$__lastResponseHeaders) . "\n" : '') .
                 ((self::$__lastResponse) ? self::$__lastResponse : NULL), "\r\n");
     }
 
@@ -92,11 +93,26 @@ abstract class BaseMethods
         self::$__lastResponse = @file_get_contents($url, FALSE, $context);
         self::$__lastResponseHeaders = $http_response_header;
 
-        // handle errors
-        if (isset(self::$__lastResponseHeaders[0]) &&
-                stripos(self::$__lastResponseHeaders[0], '401 Unauthorized') !== FALSE) {
+        $responseCode = NULL;
+        if (preg_match("#HTTP/[0-9\.]+\s+([0-9]+)#", self::$__lastResponseHeaders[0], $match)) {
+
+            $responseCode = intval($match[1]);
+        }
+        if ($responseCode === 401) {
 
             throw new UnauthorizedException();
+        } elseif ($responseCode < 200 || $responseCode >= 300) {
+
+            $message = '';
+            $json = json_decode(self::$__lastResponse, TRUE);
+            if (json_last_error() === JSON_ERROR_NONE) {
+
+                if (isset($json['Message'])) {
+
+                    $message = $json['Message'];
+                }
+            }
+            throw new BadResponseException(self::$__lastResponse, $message, $responseCode);
         }
 
         return self::$__lastResponse;
