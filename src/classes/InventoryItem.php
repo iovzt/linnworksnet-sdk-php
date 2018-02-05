@@ -22,6 +22,26 @@ class InventoryItem extends Object
     public $sku;
 
     /**
+     * @var float
+     */
+    public $weight;
+
+    /**
+     * @var float
+     */
+    public $dimHeight;
+
+    /**
+     * @var float
+     */
+    public $dimWidth;
+
+    /**
+     * @var float
+     */
+    public $dimDepth;
+
+    /**
      * @var string
      */
     public $title;
