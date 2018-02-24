@@ -26,4 +26,20 @@ class OrdersMethods extends BaseMethods
         return self::getJsonResponse('Orders/CreateOrders', $data, $sessionToken, $sessionServer);
     }
 
+    /**
+     * @param string $orderId
+     * @param array $info
+     * @param string $sessionToken
+     * @param string $sessionServer
+     * @return array
+     */
+    public static function setOrderShippingInfo($orderId, Array $info, $sessionToken, $sessionServer)
+    {
+        $data = [
+            'orderId' => $orderId,
+            'info' => $info
+        ];
+        return self::getJsonResponse('Orders/SetOrderShippingInfo', $data, $sessionToken, $sessionServer);
+    }
+
 }
