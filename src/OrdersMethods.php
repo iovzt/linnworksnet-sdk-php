@@ -2,6 +2,8 @@
 
 namespace Linnworks;
 
+use stdClass;
+
 /**
  * OrdersMethods class.
  *
@@ -28,12 +30,12 @@ class OrdersMethods extends BaseMethods
 
     /**
      * @param string $orderId
-     * @param array $info
+     * @param stdClass $info
      * @param string $sessionToken
      * @param string $sessionServer
      * @return array
      */
-    public static function setOrderShippingInfo($orderId, Array $info, $sessionToken, $sessionServer)
+    public static function setOrderShippingInfo($orderId, stdClass $info, $sessionToken, $sessionServer)
     {
         $data = [
             'orderId' => $orderId,
