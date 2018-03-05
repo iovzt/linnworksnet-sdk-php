@@ -2,6 +2,7 @@
 
 namespace Linnworks;
 
+use Linnworks\classes\ShippingMethod;
 use stdClass;
 
 /**
@@ -11,6 +12,16 @@ use stdClass;
  */
 class OrdersMethods extends BaseMethods
 {
+
+    /**
+     * @param string $sessionToken
+     * @param string $sessionServer
+     * @return ShippingMethod[]
+     */
+    public static function getShippingMethods($sessionToken, $sessionServer)
+    {
+        return self::getObjectArrayResponse(ShippingMethod::className(), 'Orders/GetShippingMethods', '', $sessionToken, $sessionServer);
+    }
 
     /**
      * @param array $orders
