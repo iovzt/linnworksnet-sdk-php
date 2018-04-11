@@ -185,4 +185,20 @@ class InventoryItem extends Object
      */
     public $containsChanges;
 
+    /**
+     * @return array
+     */
+    public function getChannelSources()
+    {
+        return array_map(function ($item) {
+            if (strpos($item, ':') !== FALSE) {
+
+                return explode(':', $item);
+            } else {
+
+                return [$item, NULL];
+            }
+        }, array_keys((array) $this->channels));
+    }
+
 }
